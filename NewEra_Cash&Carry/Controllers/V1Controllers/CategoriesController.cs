@@ -54,7 +54,7 @@ public class CategoriesController : ControllerBase
     // POST: api/Categories
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<CategoryResultDto>> AddCategoryAsync(CategoryCreateDto categoryDto)
+    public async Task<ActionResult<CategoryResultDto>> AddCategoryAsync(CategoryBaseDto categoryDto)
     {
 
 
@@ -76,7 +76,7 @@ public class CategoriesController : ControllerBase
     // PUT: api/Categories/5
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCategory(int id, CategoryUpdateDto CategoryDto)
+    public async Task<IActionResult> UpdateCategory(int id, CategoryBaseDto CategoryDto)
     {
         var category = await _categoryRepository.GetCategory(id);
         if (category == null)
