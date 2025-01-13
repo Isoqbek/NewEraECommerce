@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -57,40 +58,45 @@ builder.Services.AddApiVersioning(options =>
     options.ApiVersionReader = new UrlSegmentApiVersionReader(); // read version from URL
 });
 
+//Api versioning
+// API Explorer for Versioning
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // Format: v1, v1.0
+    options.SubstituteApiVersionInUrl = true; // Replace {version} in route
+});
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Version = "v1",
-        Title = "NewEra_Cash_Carry", 
-        Description = "This is an E-Commerce API for NewEra Cash & Carry",
-    });
+    var provider = builder.Services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
 
-    c.SwaggerDoc("v2", new OpenApiInfo
+    foreach (var description in provider.ApiVersionDescriptions)
     {
-        Version = "v2",
-        Title = "NewEra_Cash_Carry",
-        Description = "This is an E-Commerce API for NewEra Cash & Carry",
-    });
+        options.SwaggerDoc(description.GroupName, new OpenApiInfo
+        {
+            Title = $"NewEra Cash & Carry API {description.ApiVersion}",
+            Version = description.ApiVersion.ToString(),
+            Description = description.IsDeprecated ? "This API version is deprecated." : null
+        });
+    }
 
-
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
+        Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Name = "Authorization",
-        Description = "Please enter a valid token"
+        Description = "Enter 'Bearer' [space] and your token in the text input below.\n\nExample: 'Bearer abc123xyz'"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -101,11 +107,10 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -114,8 +119,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "NewEra_Cash_Carry v1");
-        options.SwaggerEndpoint("/swagger/v2/swagger.json", "NewEra_Cash_Carry v2");
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+        }
     });
 }
 

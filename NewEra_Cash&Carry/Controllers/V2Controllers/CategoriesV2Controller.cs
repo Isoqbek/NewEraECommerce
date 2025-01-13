@@ -47,7 +47,7 @@ public class CategoriesV2Controller : ControllerBase
     // POST: api/Categories
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<CategoryResultDto>> PostCategory(CategoryBaseDto categoryDto)
+    public async Task<ActionResult<CategoryResultDto>> PostCategory(CategoryCreateDto categoryDto)
     {
         if (!ModelState.IsValid)
         {
@@ -65,7 +65,7 @@ public class CategoriesV2Controller : ControllerBase
     // PUT: api/Categories/5
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCategory(int id, CategoryBaseDto CategoryDto)
+    public async Task<IActionResult> UpdateCategory(int id, CategoryCreateDto CategoryDto)
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)

@@ -6,6 +6,7 @@ using NewEra_Cash_Carry.Data;
 using NewEra_Cash_Carry.DTOs.CategoryDTOs;
 using NewEra_Cash_Carry.Interfaces;
 using NewEra_Cash_Carry.Models;
+ 
 
 
 namespace NewEra_Cash_Carry.Controllers.V1Controllers;
@@ -54,7 +55,7 @@ public class CategoriesController : ControllerBase
     // POST: api/Categories
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<CategoryResultDto>> AddCategoryAsync(CategoryBaseDto categoryDto)
+    public async Task<ActionResult<CategoryResultDto>> AddCategoryAsync(CategoryCreateDto categoryDto)
     {
 
 
@@ -76,7 +77,7 @@ public class CategoriesController : ControllerBase
     // PUT: api/Categories/5
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCategory(int id, CategoryBaseDto CategoryDto)
+    public async Task<IActionResult> UpdateCategory(int id, CategoryCreateDto CategoryDto)
     {
         var category = await _categoryRepository.GetCategory(id);
         if (category == null)

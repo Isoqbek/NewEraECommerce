@@ -8,9 +8,9 @@ namespace NewEra_Cash_Carry.Profiles
     {
         public CategoryProfile()
         {
-            CreateMap<Category, CategoryBaseDto>().ReverseMap();
+            CreateMap<Category, CategoryCreateDto>().ReverseMap();
             CreateMap<Category, CategoryResultDto>().ReverseMap();
-            CreateMap<Category, CategoryBaseDto>().ReverseMap();
+            CreateMap<Category, CategoryCreateDto>().ReverseMap();
         }
 
     }
